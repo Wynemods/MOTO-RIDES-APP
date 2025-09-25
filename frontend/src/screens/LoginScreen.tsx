@@ -70,7 +70,7 @@ export default function LoginScreen() {
     const success = await login(formData.email, formData.password);
 
     if (success) {
-      navigation.navigate('MainTabs');
+      (navigation as any).navigate('MainTabs');
     }
   };
 
@@ -234,7 +234,7 @@ export default function LoginScreen() {
               {/* Register Link */}
               <View style={styles.registerContainer}>
                 <Text style={styles.registerText}>Don't have an account? </Text>
-                <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                <TouchableOpacity onPress={() => (navigation as any).navigate('Register')}>
                   <Text style={styles.registerLink}>Create Account</Text>
                 </TouchableOpacity>
               </View>

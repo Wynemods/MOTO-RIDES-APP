@@ -32,7 +32,8 @@ class ConnectionService extends EventEmitter {
       this.isInternetReachable = state.isInternetReachable;
       this.connectionType = state.type;
       this.isWifiEnabled = state.isWifiEnabled ?? false;
-      this.isCellularEnabled = state.isCellularEnabled ?? false;
+      // Note: isCellularEnabled is not available in all NetInfo states
+      this.isCellularEnabled = (state as any).isCellularEnabled ?? false;
 
       // Emit connection status change
       this.emit('connectionChange', this.getConnectionStatus());

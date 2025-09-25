@@ -7,10 +7,10 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  Image,
-  Picker
+  Image
 } from 'react-native';
-import { apiService } from '../services/api.service';
+import { Picker } from '@react-native-picker/picker';
+import ApiService from '../services/api.service';
 
 interface Vehicle {
   id: string;
@@ -71,7 +71,7 @@ export const DriverProfileSettings: React.FC<DriverProfileSettingsProps> = ({
   const loadProfile = async () => {
     try {
       setLoading(true);
-      const response = await apiService.getDriverProfile();
+      const response = await ApiService.getDriverProfile();
       setProfile(response);
       setProfileData({
         name: response.name,
@@ -89,7 +89,7 @@ export const DriverProfileSettings: React.FC<DriverProfileSettingsProps> = ({
   const handleProfileUpdate = async () => {
     try {
       setSaving(true);
-      await apiService.updateDriverProfile(profileData);
+      await ApiService.updateDriverProfile(profileData);
       Alert.alert('Success', 'Profile updated successfully');
       loadProfile();
     } catch (error) {
@@ -103,7 +103,7 @@ export const DriverProfileSettings: React.FC<DriverProfileSettingsProps> = ({
   const handleVehicleUpdate = async (vehicleId: string) => {
     try {
       setSaving(true);
-      await apiService.updateVehicle(vehicleId, vehicleData);
+      await ApiService.updateVehicle(vehicleId, vehicleData);
       Alert.alert('Success', 'Vehicle updated successfully');
       setEditingVehicle(null);
       loadProfile();
@@ -118,7 +118,7 @@ export const DriverProfileSettings: React.FC<DriverProfileSettingsProps> = ({
   const handleAddVehicle = async () => {
     try {
       setSaving(true);
-      await apiService.addVehicle(vehicleData);
+      await ApiService.addVehicle(vehicleData);
       Alert.alert('Success', 'Vehicle added successfully');
       setShowAddVehicle(false);
       setVehicleData({
@@ -150,7 +150,7 @@ export const DriverProfileSettings: React.FC<DriverProfileSettingsProps> = ({
           style: 'destructive',
           onPress: async () => {
             try {
-              await apiService.removeVehicle(vehicleId);
+              await ApiService.removeVehicle(vehicleId);
               Alert.alert('Success', 'Vehicle removed successfully');
               loadProfile();
             } catch (error) {

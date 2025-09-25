@@ -153,7 +153,7 @@ const ConnectionStatusNotification: React.FC = () => {
   return (
     <View style={styles.container}>
       {notifications.map((notification) => {
-        const styles = getNotificationStyles(notification.type);
+        const notificationStyles = getNotificationStyles(notification.type);
         const fadeAnim = notificationRefs.current[notification.id] || new Animated.Value(1);
         const slideAnim = new Animated.Value(0);
 
@@ -161,7 +161,7 @@ const ConnectionStatusNotification: React.FC = () => {
           <Animated.View
             key={notification.id}
             style={[
-              styles.container,
+              notificationStyles.container,
               {
                 opacity: fadeAnim,
                 transform: [{ translateY: slideAnim }],
@@ -171,13 +171,13 @@ const ConnectionStatusNotification: React.FC = () => {
             <View style={styles.content}>
               <View style={styles.iconContainer}>
                 <MaterialIcons
-                  name={styles.icon as any}
+                  name={notificationStyles.icon as any}
                   size={20}
-                  color={styles.iconColor}
+                  color={notificationStyles.iconColor}
                 />
               </View>
               
-              <Text style={[styles.message, { color: styles.textColor }]}>
+              <Text style={[styles.message, { color: notificationStyles.textColor }]}>
                 {notification.message}
               </Text>
 
@@ -188,7 +188,7 @@ const ConnectionStatusNotification: React.FC = () => {
                 <MaterialIcons
                   name="close"
                   size={16}
-                  color={styles.textColor}
+                  color={notificationStyles.textColor}
                 />
               </TouchableOpacity>
             </View>
