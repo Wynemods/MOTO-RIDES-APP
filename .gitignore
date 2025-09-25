@@ -1,0 +1,90 @@
+﻿# Root
+node_modules/
+.npm/
+.nvm/
+.tmp/
+.DS_Store
+Thumbs.db
+.env
+.env.*
+*.log
+*.pid
+*.seed
+*.pid.lock
+coverage/
+dist/
+build/
+.tmp/
+.cache/
+.pnp*
+yarn.lock
+pnpm-lock.yaml
+package-lock.json
+
+# OS/Editors
+.idea/
+.vscode/
+*.swp
+
+# Monorepo: admin-panel (Next.js)
+admin-panel/.next/
+admin-panel/out/
+admin-panel/node_modules/
+admin-panel/.env*
+admin-panel/.vercel/
+admin-panel/.turbo/
+admin-panel/.cache/
+
+# Monorepo: backend (NestJS + Prisma)
+backend/node_modules/
+backend/dist/
+backend/.env*
+backend/coverage/
+backend/.turbo/
+backend/.cache/
+backend/prisma/*.db
+backend/prisma/*.sqlite
+backend/prisma/migrations/**/shadow-database*
+backend/prisma/.env
+
+# Monorepo: frontend (Expo/React Native)
+frontend/node_modules/
+frontend/.expo/
+frontend/.expo-shared/
+frontend/.env*
+frontend/android/
+frontend/ios/
+frontend/dist/
+frontend/web-build/
+frontend/coverage/
+
+# Logs and reports
+**/*.log
+**/*.tsbuildinfo
+**/.eslintcache
+**/.stylelintcache
+**/.cache
+**/.parcel-cache
+
+# Images and binaries
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.ico
+*.svg
+!admin-panel/public/*.svg
+!frontend/assets/*.png
+!frontend/assets/*.ico
+
+# Misc
+**/*.local
+**/*.secret
+**/*.key
+**/*.pem
+**/*.crt
+**/.env.local
+**/.env.production
+**/.env.development
+

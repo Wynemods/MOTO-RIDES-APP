@@ -1,0 +1,294 @@
+{
+  "analysis_metadata": {
+    "feature": "Split Fare",
+    "location": "HomeScreen.tsx",
+    "analysis_date": "2024-12-19",
+    "status": "INCOMPLETE_IMPLEMENTATION",
+    "compliance": "0%"
+  },
+  "current_implementation": {
+    "ui_component": {
+      "location": "HomeScreen.tsx lines 392-395",
+      "code": "<TouchableOpacity style={styles.actionButton}>\n  <FontAwesome5 name=\"users\" size={16} color=\"#000\" />\n  <Text style={styles.actionButtonText}>Split Fare</Text>\n</TouchableOpacity>",
+      "type": "Static UI Button",
+      "functionality": "None - No onPress handler"
+    },
+    "visual_design": {
+      "icon": "FontAwesome5 users icon",
+      "text": "Split Fare",
+      "styling": "actionButton style",
+      "position": "Action buttons row (with Schedule and Promo buttons)"
+    }
+  },
+  "missing_functionality": {
+    "frontend_components": [
+      "SplitFareModal - Modal for selecting passengers",
+      "PassengerSelector - Component to add/remove passengers",
+      "FareSplitCalculator - Calculate individual shares",
+      "PaymentMethodSelector - Choose how each person pays",
+      "SplitFareConfirmation - Review and confirm split payment"
+    ],
+    "backend_apis": [
+      "POST /rides/split-fare - Create split fare ride",
+      "GET /rides/split-fare/:id - Get split fare details",
+      "POST /rides/split-fare/:id/invite - Invite passengers",
+      "POST /rides/split-fare/:id/accept - Accept split fare invitation",
+      "POST /rides/split-fare/:id/pay - Pay individual share",
+      "GET /rides/split-fare/:id/status - Get payment status"
+    ],
+    "database_schema": [
+      "SplitFareRide table - Main split fare ride record",
+      "SplitFarePassenger table - Individual passenger records",
+      "SplitFarePayment table - Individual payment records",
+      "SplitFareInvitation table - Invitation tracking"
+    ],
+    "business_logic": [
+      "Fare calculation and splitting algorithm",
+      "Passenger invitation system",
+      "Payment collection and tracking",
+      "Refund handling for cancellations",
+      "Notification system for invitations and payments"
+    ]
+  },
+  "technical_analysis": {
+    "current_state": {
+      "ui_present": true,
+      "functionality": false,
+      "backend_support": false,
+      "database_support": false,
+      "integration": false
+    },
+    "existing_infrastructure": {
+      "wallet_transfer": "Wallet service has transferMoney method for split payments",
+      "fare_calculation": "Fare calculation system exists (60 KSH/km)",
+      "payment_methods": "M-Pesa, Stripe, Wallet, Cash support",
+      "user_management": "User authentication and profiles exist",
+      "notification_system": "Notification system exists"
+    },
+    "integration_points": {
+      "fare_display": "Can integrate with existing FareDisplay component",
+      "payment_system": "Can use existing payment methods",
+      "user_context": "Can use existing user authentication",
+      "ride_management": "Can extend existing ride system"
+    }
+  },
+  "proposed_implementation": {
+    "phase_1_ui_components": {
+      "SplitFareModal": {
+        "purpose": "Main modal for split fare setup",
+        "features": [
+          "Add/remove passengers by phone number or email",
+          "Calculate individual fare shares",
+          "Select payment methods for each passenger",
+          "Send invitations to passengers"
+        ]
+      },
+      "PassengerList": {
+        "purpose": "Display and manage passengers",
+        "features": [
+          "Show passenger details and payment status",
+          "Remove passengers before ride starts",
+          "Resend invitations",
+          "View payment confirmations"
+        ]
+      },
+      "FareSplitDisplay": {
+        "purpose": "Show fare breakdown and individual shares",
+        "features": [
+          "Total fare calculation",
+          "Individual share calculation",
+          "Payment method per person",
+          "Real-time payment status"
+        ]
+      }
+    },
+    "phase_2_backend_apis": {
+      "split_fare_controller": {
+        "endpoints": [
+          "POST /rides/split-fare - Create split fare ride",
+          "GET /rides/split-fare/:id - Get split fare details",
+          "POST /rides/split-fare/:id/invite - Invite passengers",
+          "POST /rides/split-fare/:id/accept - Accept invitation",
+          "POST /rides/split-fare/:id/pay - Pay individual share",
+          "GET /rides/split-fare/:id/status - Get payment status",
+          "POST /rides/split-fare/:id/cancel - Cancel split fare"
+        ]
+      },
+      "split_fare_service": {
+        "methods": [
+          "createSplitFareRide()",
+          "invitePassengers()",
+          "acceptInvitation()",
+          "processPayment()",
+          "calculateShares()",
+          "sendNotifications()"
+        ]
+      }
+    },
+    "phase_3_database_schema": {
+      "SplitFareRide": {
+        "fields": [
+          "id, rideId, initiatorId, totalFare, shareAmount, status, createdAt, updatedAt"
+        ]
+      },
+      "SplitFarePassenger": {
+        "fields": [
+          "id, splitFareRideId, userId, phoneNumber, email, shareAmount, paymentMethod, paymentStatus, invitedAt, acceptedAt, paidAt"
+        ]
+      },
+      "SplitFareInvitation": {
+        "fields": [
+          "id, splitFareRideId, passengerId, invitationCode, status, expiresAt, createdAt"
+        ]
+      }
+    }
+  },
+  "user_flow_design": {
+    "step_1_initiate": {
+      "action": "User taps Split Fare button",
+      "result": "SplitFareModal opens",
+      "data_required": "Current ride details (pickup, destination, fare)"
+    },
+    "step_2_add_passengers": {
+      "action": "User adds passengers by phone/email",
+      "result": "Passengers added to list",
+      "data_required": "Passenger contact information"
+    },
+    "step_3_configure_payments": {
+      "action": "User selects payment method for each passenger",
+      "result": "Payment methods assigned",
+      "data_required": "Payment preferences per passenger"
+    },
+    "step_4_send_invitations": {
+      "action": "User sends invitations to passengers",
+      "result": "SMS/email invitations sent",
+      "data_required": "Contact information and invitation message"
+    },
+    "step_5_passenger_acceptance": {
+      "action": "Passengers accept invitations",
+      "result": "Passengers added to ride",
+      "data_required": "Invitation code and passenger confirmation"
+    },
+    "step_6_payment_collection": {
+      "action": "Each passenger pays their share",
+      "result": "Individual payments processed",
+      "data_required": "Payment method and amount per passenger"
+    },
+    "step_7_ride_confirmation": {
+      "action": "All payments collected, ride confirmed",
+      "result": "Ride proceeds normally",
+      "data_required": "All passenger payments confirmed"
+    }
+  },
+  "business_rules": {
+    "fare_splitting": {
+      "equal_split": "Fare divided equally among all passengers",
+      "minimum_share": "Minimum 50 KSH per person",
+      "maximum_passengers": "Maximum 4 passengers per ride",
+      "rounding": "Round up to nearest 5 KSH for fairness"
+    },
+    "payment_collection": {
+      "payment_deadline": "All payments must be collected before ride starts",
+      "refund_policy": "Full refund if ride cancelled before start",
+      "partial_refund": "Proportional refund if ride cancelled mid-trip",
+      "payment_methods": "Each passenger can choose their preferred method"
+    },
+    "invitation_system": {
+      "invitation_expiry": "Invitations expire after 30 minutes",
+      "resend_limit": "Maximum 3 resends per passenger",
+      "acceptance_deadline": "Must accept within 15 minutes of invitation"
+    }
+  },
+  "technical_requirements": {
+    "frontend_dependencies": [
+      "React Native Modal",
+      "Phone number validation",
+      "Email validation",
+      "SMS/Email integration",
+      "Real-time updates"
+    ],
+    "backend_dependencies": [
+      "SMS service integration",
+      "Email service integration",
+      "Payment gateway integration",
+      "WebSocket for real-time updates",
+      "Database transactions"
+    ],
+    "security_considerations": [
+      "Validate passenger phone numbers",
+      "Secure invitation codes",
+      "Payment verification",
+      "User authentication for all actions",
+      "Rate limiting for invitations"
+    ]
+  },
+  "integration_with_existing_systems": {
+    "fare_calculation": {
+      "integration": "Use existing 60 KSH/km calculation",
+      "modification": "Add split fare multiplier and rounding",
+      "location": "FareDisplay component"
+    },
+    "payment_system": {
+      "integration": "Use existing M-Pesa, Stripe, Wallet, Cash methods",
+      "modification": "Add split payment processing",
+      "location": "PaymentsService"
+    },
+    "ride_management": {
+      "integration": "Extend existing ride system",
+      "modification": "Add split fare ride type",
+      "location": "RidesService and RidesController"
+    },
+    "notification_system": {
+      "integration": "Use existing notification system",
+      "modification": "Add split fare specific notifications",
+      "location": "NotificationService"
+    }
+  },
+  "development_effort_estimate": {
+    "frontend_components": "3-4 days",
+    "backend_apis": "4-5 days",
+    "database_schema": "1-2 days",
+    "integration_testing": "2-3 days",
+    "total_effort": "10-14 days"
+  },
+  "testing_requirements": {
+    "unit_tests": [
+      "Fare splitting calculations",
+      "Payment processing",
+      "Invitation system",
+      "User validation"
+    ],
+    "integration_tests": [
+      "End-to-end split fare flow",
+      "Payment gateway integration",
+      "SMS/Email delivery",
+      "Real-time updates"
+    ],
+    "user_acceptance_tests": [
+      "Split fare creation",
+      "Passenger invitation",
+      "Payment collection",
+      "Ride completion"
+    ]
+  },
+  "recommendations": {
+    "immediate_actions": [
+      "Add onPress handler to Split Fare button",
+      "Create SplitFareModal component",
+      "Design passenger selection UI",
+      "Plan database schema"
+    ],
+    "development_priority": "Medium - Nice to have feature",
+    "user_impact": "High - Popular feature for group rides",
+    "technical_complexity": "High - Requires multiple integrations",
+    "business_value": "High - Increases user engagement and ride frequency"
+  },
+  "current_status_summary": {
+    "ui_present": "✅ Split Fare button exists in HomeScreen",
+    "functionality": "❌ No functionality implemented",
+    "backend_support": "❌ No backend APIs",
+    "database_support": "❌ No database schema",
+    "integration": "❌ Not integrated with existing systems",
+    "overall_status": "INCOMPLETE - UI placeholder only"
+  }
+}

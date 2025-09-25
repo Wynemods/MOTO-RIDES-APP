@@ -1,0 +1,276 @@
+{
+  "summary": "MOTO Rides codebase has good structure but contains critical security vulnerabilities, incomplete implementations, and missing error handling that prevent production deployment",
+  "metrics": {
+    "build_status": "pass",
+    "test_coverage": null,
+    "open_critical_issues": 8
+  },
+  "issues": [
+    {
+      "id": "ISSUE-001",
+      "title": "Hardcoded database password in env.example",
+      "severity": "critical",
+      "confidence": "high",
+      "files": ["backend/env.example:5"],
+      "description": "The env.example file contains a hardcoded database password 'Alexmods' which is a major security vulnerability. This file is typically committed to version control and exposes sensitive credentials.",
+      "evidence": "DB_PASSWORD=Alexmods",
+      "repro_steps": [
+        "Open backend/env.example",
+        "Check line 5 for hardcoded password"
+      ],
+      "suggested_fix": "Remove the hardcoded password and replace with placeholder: DB_PASSWORD=your-secure-password-here",
+      "test_to_add": "Add test to verify no hardcoded credentials in env.example",
+      "estimated_effort_hours": 0.5,
+      "priority": "must-fix"
+    },
+    {
+      "id": "ISSUE-002",
+      "title": "Insecure CORS configuration allows all origins",
+      "severity": "critical",
+      "confidence": "high",
+      "files": ["backend/src/main.ts:10-13"],
+      "description": "CORS is configured with origin: true which allows requests from any domain. This creates security vulnerabilities for CSRF attacks and data theft.",
+      "evidence": "app.enableCors({ origin: true, credentials: true })",
+      "repro_steps": [
+        "Start the backend server",
+        "Make a request from any domain with credentials"
+      ],
+      "suggested_fix": "Configure specific allowed origins: app.enableCors({ origin: ['http://localhost:3000', 'https://yourdomain.com'], credentials: true })",
+      "test_to_add": "Add CORS security test to verify only allowed origins can access the API",
+      "estimated_effort_hours": 1,
+      "priority": "must-fix"
+    },
+    {
+      "id": "ISSUE-003",
+      "title": "Missing input validation on location endpoints",
+      "severity": "high",
+      "confidence": "high",
+      "files": ["backend/src/locations/locations.controller.ts:15-19"],
+      "description": "Location creation endpoint accepts 'any' type without proper validation, allowing potential injection attacks and data corruption.",
+      "evidence": "create(@Request() req, @Body() locationData: any)",
+      "repro_steps": [
+        "Send POST request to /locations with malformed data",
+        "Observe lack of validation errors"
+      ],
+      "suggested_fix": "Create proper DTO with validation decorators for location data",
+      "test_to_add": "Add validation tests for location creation endpoint",
+      "estimated_effort_hours": 2,
+      "priority": "must-fix"
+    },
+    {
+      "id": "ISSUE-004",
+      "title": "No tests found in codebase",
+      "severity": "high",
+      "confidence": "high",
+      "files": ["backend/package.json:16"],
+      "description": "The test command fails with 'No tests found' indicating zero test coverage. This makes the codebase unreliable and prone to regressions.",
+      "evidence": "npm test returns: No tests found, exiting with code 1",
+      "repro_steps": [
+        "cd backend",
+        "npm test"
+      ],
+      "suggested_fix": "Create comprehensive test suite covering all services, controllers, and critical business logic",
+      "test_to_add": "Implement unit tests for all services and integration tests for API endpoints",
+      "estimated_effort_hours": 16,
+      "priority": "should-fix"
+    },
+    {
+      "id": "ISSUE-005",
+      "title": "Incomplete payment processing implementation",
+      "severity": "high",
+      "confidence": "medium",
+      "files": ["backend/src/rides/rides.service.ts:280-282"],
+      "description": "Payment processing is marked as TODO in critical ride completion flow, meaning payments are not actually processed when rides complete.",
+      "evidence": "// TODO: Process payment",
+      "repro_steps": [
+        "Complete a ride through the API",
+        "Check if payment is actually processed"
+      ],
+      "suggested_fix": "Implement actual payment processing logic in ride completion flow",
+      "test_to_add": "Add payment processing tests for ride completion",
+      "estimated_effort_hours": 8,
+      "priority": "must-fix"
+    },
+    {
+      "id": "ISSUE-006",
+      "title": "WebSocket authentication bypass vulnerability",
+      "severity": "high",
+      "confidence": "medium",
+      "files": ["backend/src/websockets/websockets.gateway.ts:49-70"],
+      "description": "WebSocket connection handling has weak authentication that could allow unauthorized access to real-time features.",
+      "evidence": "Authentication logic in handleConnection method lacks proper error handling and validation",
+      "repro_steps": [
+        "Connect to WebSocket without valid token",
+        "Observe connection acceptance"
+      ],
+      "suggested_fix": "Implement proper JWT validation and connection rejection for invalid tokens",
+      "test_to_add": "Add WebSocket authentication tests",
+      "estimated_effort_hours": 4,
+      "priority": "must-fix"
+    },
+    {
+      "id": "ISSUE-007",
+      "title": "Frontend API base URL hardcoded to localhost",
+      "severity": "medium",
+      "confidence": "high",
+      "files": ["frontend/src/services/api.service.ts:4"],
+      "description": "API base URL is hardcoded to localhost, preventing deployment to different environments without code changes.",
+      "evidence": "const API_BASE_URL = 'http://localhost:3000';",
+      "repro_steps": [
+        "Deploy frontend to production",
+        "Observe API calls failing due to localhost URL"
+      ],
+      "suggested_fix": "Use environment variables for API base URL configuration",
+      "test_to_add": "Add environment configuration tests",
+      "estimated_effort_hours": 2,
+      "priority": "should-fix"
+    },
+    {
+      "id": "ISSUE-008",
+      "title": "Missing error handling in payment services",
+      "severity": "medium",
+      "confidence": "high",
+      "files": ["backend/src/payments/services/mpesa.service.ts:132", "backend/src/payments/services/stripe.service.ts:64"],
+      "description": "Payment services use console.error for error logging instead of proper error handling, making debugging difficult and potentially exposing sensitive information.",
+      "evidence": "console.error('M-Pesa STK Push error:', error.response?.data || error.message);",
+      "repro_steps": [
+        "Trigger payment error",
+        "Check logs for proper error handling"
+      ],
+      "suggested_fix": "Replace console.error with proper logging service and structured error handling",
+      "test_to_add": "Add error handling tests for payment services",
+      "estimated_effort_hours": 3,
+      "priority": "should-fix"
+    },
+    {
+      "id": "ISSUE-009",
+      "title": "Database schema inconsistencies",
+      "severity": "medium",
+      "confidence": "medium",
+      "files": ["backend/prisma/schema.prisma:46-49"],
+      "description": "Driver location fields use Int type instead of Decimal for coordinates, which can cause precision loss for GPS coordinates.",
+      "evidence": "currentLat Int?, currentLng Int?",
+      "repro_steps": [
+        "Store GPS coordinates with decimal precision",
+        "Observe precision loss"
+      ],
+      "suggested_fix": "Change coordinate fields to Decimal type for proper GPS precision",
+      "test_to_add": "Add coordinate precision tests",
+      "estimated_effort_hours": 2,
+      "priority": "should-fix"
+    },
+    {
+      "id": "ISSUE-010",
+      "title": "Missing rate limiting on API endpoints",
+      "severity": "medium",
+      "confidence": "high",
+      "files": ["backend/src/main.ts:1-39"],
+      "description": "No rate limiting is implemented on API endpoints, making the system vulnerable to abuse and DoS attacks.",
+      "evidence": "No rate limiting middleware found in main.ts",
+      "repro_steps": [
+        "Make rapid requests to any API endpoint",
+        "Observe no rate limiting applied"
+      ],
+      "suggested_fix": "Implement express-rate-limit middleware on all API routes",
+      "test_to_add": "Add rate limiting tests",
+      "estimated_effort_hours": 3,
+      "priority": "should-fix"
+    }
+  ],
+  "api_endpoints": [
+    {
+      "path": "/",
+      "method": "GET",
+      "auth_required": false,
+      "status_expected": [200],
+      "issues": []
+    },
+    {
+      "path": "/health",
+      "method": "GET",
+      "auth_required": false,
+      "status_expected": [200],
+      "issues": []
+    },
+    {
+      "path": "/auth/register",
+      "method": "POST",
+      "auth_required": false,
+      "status_expected": [201, 409, 400],
+      "issues": []
+    },
+    {
+      "path": "/auth/login",
+      "method": "POST",
+      "auth_required": false,
+      "status_expected": [200, 401, 400],
+      "issues": []
+    },
+    {
+      "path": "/auth/profile",
+      "method": "GET",
+      "auth_required": true,
+      "status_expected": [200, 401],
+      "issues": []
+    },
+    {
+      "path": "/rides",
+      "method": "POST",
+      "auth_required": true,
+      "status_expected": [201, 400, 401],
+      "issues": ["ISSUE-005"]
+    },
+    {
+      "path": "/rides",
+      "method": "GET",
+      "auth_required": true,
+      "status_expected": [200, 401],
+      "issues": []
+    },
+    {
+      "path": "/rides/:id/complete",
+      "method": "POST",
+      "auth_required": true,
+      "status_expected": [200, 404, 401],
+      "issues": ["ISSUE-005"]
+    },
+    {
+      "path": "/payments",
+      "method": "POST",
+      "auth_required": true,
+      "status_expected": [201, 400, 401],
+      "issues": ["ISSUE-008"]
+    },
+    {
+      "path": "/locations",
+      "method": "POST",
+      "auth_required": true,
+      "status_expected": [201, 400, 401],
+      "issues": ["ISSUE-003"]
+    },
+    {
+      "path": "/drivers/register",
+      "method": "POST",
+      "auth_required": true,
+      "status_expected": [201, 400, 401],
+      "issues": []
+    }
+  ],
+  "suggested_roadmap": {
+    "must_fix": ["ISSUE-001", "ISSUE-002", "ISSUE-003", "ISSUE-005", "ISSUE-006"],
+    "should_fix": ["ISSUE-004", "ISSUE-007", "ISSUE-008", "ISSUE-009", "ISSUE-010"],
+    "nice_to_have": []
+  },
+  "autopatches": [
+    {
+      "issue_id": "ISSUE-001",
+      "patch_diff": "--- a/backend/env.example\n+++ b/backend/env.example\n@@ -2,7 +2,7 @@ DB_HOST=localhost\n DB_PORT=5432\n DB_USERNAME=postgres\n-DB_PASSWORD=Alexmods\n+DB_PASSWORD=your-secure-password-here\n DB_NAME=motolink",
+      "apply_risk": "low"
+    },
+    {
+      "issue_id": "ISSUE-002",
+      "patch_diff": "--- a/backend/src/main.ts\n+++ b/backend/src/main.ts\n@@ -7,7 +7,10 @@ import { AppModule } from './app.module';\n async function bootstrap() {\n   const app = await NestFactory.create(AppModule);\n \n-  // Enable CORS\n-  app.enableCors({\n-    origin: true,\n+  // Enable CORS\n+  app.enableCors({\n+    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],\n     credentials: true,\n   });",
+      "apply_risk": "medium"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "expo": {
+    "name": "MotoLink",
+    "slug": "motolink",
+    "version": "1.0.0",
+    "sdkVersion": "54.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "platforms": ["android", "ios"],
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.motolink.app",
+      "buildNumber": "1.0.0",
+      "config": {
+        "googleMapsApiKey": "YOUR_IOS_GOOGLE_MAPS_API_KEY"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#000000"
+      },
+      "package": "com.motolink.app",
+      "versionCode": 1,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "NOTIFICATIONS"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "YOUR_ANDROID_GOOGLE_MAPS_API_KEY"
+        }
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-location",
+      "expo-camera",
+      "expo-notifications"
+    ],
+    "extra": {
+      "api": {
+        "baseUrl": "http://10.0.2.2:3000",
+        "webBaseUrl": "http://localhost:3000"
+      },
+      "googleMaps": {
+        "androidApiKey": "YOUR_ANDROID_GOOGLE_MAPS_API_KEY",
+        "iosApiKey": "YOUR_IOS_GOOGLE_MAPS_API_KEY"
+      },
+      "eas": {
+        "projectId": "MOTO-RIDES-FRONTEND"
+      }
+    }
+  }
+}

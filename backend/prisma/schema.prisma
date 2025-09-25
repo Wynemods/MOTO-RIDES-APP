@@ -1,0 +1,366 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                              String              @id(map: "PK_a3ffb1c0c8416b9fc6f907b7433") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email                           String              @unique(map: "UQ_97672ac88f789774dd47f7c8be3") @db.VarChar
+  name                            String              @db.VarChar
+  phone                           String              @unique(map: "UQ_a000cca60bcf04454e727699490") @db.VarChar
+  password                        String              @db.VarChar
+  userType                        users_usertype_enum @default(student)
+  studentId                       String?             @db.VarChar
+  deviceToken                     String?             @db.VarChar
+  isActive                        Boolean             @default(true)
+  profileImage                    String?             @db.VarChar
+  rating                          Int                 @default(0)
+  roles                           UserRole[]          @default([rider])
+  activeRole                      UserRole            @default(rider)
+  driverVerified                  Boolean             @default(false)
+  driverVerificationStatus        DriverVerificationStatus @default(pending)
+  driverVerificationDocuments     Json?               @default("{}")
+  driverVerificationNotes         String?             @db.Text
+  driverVerificationDate          DateTime?           @db.Timestamp(6)
+  totalRides                      Int                 @default(0)
+  cancellationCount               Int                 @default(0)
+  hasActiveFine                   Boolean             @default(false)
+  fineAmount                      Decimal?            @db.Decimal(10, 2)
+  finePaidAt                      DateTime?           @db.Timestamp(6)
+  metadata                        Json?               @default("{}")
+  createdAt                       DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt                       DateTime            @default(now()) @updatedAt @db.Timestamp(6)
+  driverId                        String?             @unique(map: "REL_02433f6ac7ad98535b3d7d34da") @db.Uuid
+  driver                          Driver?
+  locations                       Location[]
+  notifications                   Notification[]
+  payments                        Payment[]
+  rides                           Ride[]
+  ratings                         Rating[]
+  splitFarePayments               SplitFarePayment[]
+  drivers_users_driverIdTodrivers Driver?             @relation("users_driverIdTodrivers", fields: [driverId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_02433f6ac7ad98535b3d7d34da5")
+
+  @@map("users")
+}
+
+model Driver {
+  id                            String              @id(map: "PK_92ab3fb69e566d3eb0cae896047") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name                          String              @db.VarChar
+  phoneNumber                   String              @unique(map: "UQ_drivers_phone_number") @db.VarChar
+  profilePictureUrl             String?             @db.VarChar
+  licenseNumber                 String              @unique(map: "UQ_754b3d50a8cc64f7ad5c24f62b4") @db.VarChar
+  licenseExpiry                 DateTime            @db.Timestamp(6)
+  governmentId                  String?             @db.VarChar
+  rating                        Int                 @default(0)
+  totalRides                    Int                 @default(0)
+  totalEarnings                 Int                 @default(0)
+  status                        drivers_status_enum @default(offline)
+  isVerified                    Boolean             @default(false)
+  isActive                      Boolean             @default(true)
+  isAvailable                   Boolean             @default(false)
+  currentLat                    Decimal?            @db.Decimal(10, 8)
+  currentLng                    Decimal?            @db.Decimal(11, 8)
+  currentHeading                Decimal?            @db.Decimal(5, 2)
+  currentSpeed                  Decimal?            @db.Decimal(5, 2)
+  lastLocationUpdate            DateTime?           @db.Timestamp(6)
+  penalties                     Json?               @default("[]")
+  earnings                      Decimal             @default(0) @db.Decimal(10, 2)
+  availabilityReason            String?             @db.Text
+  createdAt                     DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt                     DateTime            @default(now()) @updatedAt @db.Timestamp(6)
+  userId                        String?             @unique(map: "REL_57d866371f392f459cd9ee46f6") @db.Uuid
+  user                          User?               @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_57d866371f392f459cd9ee46f6a")
+  rides                         Ride[]
+  ratings                       Rating[]
+  users_users_driverIdTodrivers User?               @relation("users_driverIdTodrivers")
+  vehicles                      Vehicle[]
+
+  @@map("drivers")
+}
+
+model Vehicle {
+  id                    String             @id(map: "PK_18d8646b59304dce4af3a9e35b6") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  type                  vehicles_type_enum @default(motorcycle)
+  brand                 String             @db.VarChar
+  model                 String             @db.VarChar
+  color                 String             @db.VarChar
+  numberPlate           String             @unique(map: "UQ_66ea96381a7a7ceb35c72f36625") @db.VarChar
+  year                  Int?
+  insuranceDocUrl       String?            @db.VarChar
+  isActive              Boolean            @default(true)
+  isVerified            Boolean            @default(false)
+  createdAt             DateTime           @default(now()) @db.Timestamp(6)
+  updatedAt             DateTime           @default(now()) @updatedAt @db.Timestamp(6)
+  driverId              String?            @db.Uuid
+  driver                Driver?            @relation(fields: [driverId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_28d7607488252336b22511e9e80")
+
+  @@map("vehicles")
+}
+
+model Ride {
+  id                 String                   @id(map: "PK_ca6f62fc1e999b139c7f28f07fd") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  pickupLat          Int
+  pickupLng          Int
+  pickupAddress      String                   @db.VarChar
+  destinationLat     Int
+  destinationLng     Int
+  destinationAddress String                   @db.VarChar
+  currentLat         Int?
+  currentLng         Int?
+  fare               Decimal                  @db.Decimal(10, 2)
+  status             rides_status_enum        @default(pending)
+  paymentMethod      rides_paymentmethod_enum
+  estimatedArrival   Int?
+  actualArrival      Int?
+  notes              String?                  @db.VarChar
+  metadata           Json?                    @default("{}")
+  acceptedAt         DateTime?                @db.Timestamp(6)
+  startedAt          DateTime?                @db.Timestamp(6)
+  completedAt        DateTime?                @db.Timestamp(6)
+  // Cash payment confirmation fields
+  isCashPayment      Boolean                  @default(false)
+  driverCashConfirm  Boolean?                 @default(false)
+  riderCashConfirm   Boolean?                 @default(false)
+  cashConfirmDate    DateTime?                @db.Timestamp(6)
+  commissionDeducted Boolean                  @default(false)
+  commissionAmount   Decimal?                 @db.Decimal(10, 2)
+  disputeFlagged     Boolean                  @default(false)
+  disputeReason      String?                  @db.Text
+  adminResolved      Boolean                  @default(false)
+  adminResolution    String?                  @db.Text
+  // Split fare fields
+  isSplitFare        Boolean                  @default(false)
+  splitFareData      Json?                    @default("{}")
+  totalFare          Decimal?                 @db.Decimal(10, 2)
+  driverEarnings     Decimal?                 @db.Decimal(10, 2)
+  appCommission      Decimal?                 @db.Decimal(10, 2)
+  fundsLocked        Boolean                  @default(false)
+  fundsReleased      Boolean                  @default(false)
+  createdAt          DateTime                 @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime                 @default(now()) @updatedAt @db.Timestamp(6)
+  riderId            String?                  @db.Uuid
+  driverId           String?                  @db.Uuid
+  payments           Payment[]
+  ratings            Rating[]
+  splitFarePayments  SplitFarePayment[]
+  driver             Driver?                  @relation(fields: [driverId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_0adda088d567495e71d21b6c691")
+  rider              User?                    @relation(fields: [riderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3c581fc8082dc803233ec676ef9")
+
+  @@map("rides")
+}
+
+model Payment {
+  id            String               @id(map: "PK_197ab7af18c93fbb0c9b28b4a59") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId        String               @db.Uuid
+  rideId        String?              @db.Uuid
+  amount        Decimal              @db.Decimal(10, 2)
+  currency      String               @default("KES") @db.VarChar
+  method        payments_method_enum
+  status        payments_status_enum @default(pending)
+  type          payments_type_enum
+  description   String?              @db.VarChar
+  reference     String?              @db.VarChar
+  externalId    String?              @db.VarChar
+  transactionId String?              @db.VarChar
+  metadata      Json?                @db.Json
+  createdAt     DateTime             @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime             @default(now()) @updatedAt @db.Timestamp(6)
+  user          User                 @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_d35cb3c13a18e1ea1705b2817b1")
+  ride          Ride?                @relation(fields: [rideId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_e979c43b9a5f2bcfb69ee795a6a")
+
+  @@map("payments")
+}
+
+model Notification {
+  id        String                  @id(map: "PK_6a72c3c0f683f6462415e653c3a") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId    String                  @db.Uuid
+  title     String                  @db.VarChar
+  message   String
+  type      notifications_type_enum
+  isRead    Boolean                 @default(false)
+  data      Json?                   @db.Json
+  image     String?                 @db.VarChar
+  actionUrl String?                 @db.VarChar
+  createdAt DateTime                @default(now()) @db.Timestamp(6)
+  updatedAt DateTime                @default(now()) @updatedAt @db.Timestamp(6)
+  user      User                    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_692a909ee0fa9383e7859f9b406")
+
+  @@map("notifications")
+}
+
+model Location {
+  id        String              @id(map: "PK_7cc1c9e3853b94816c094825e74") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId    String              @db.Uuid
+  name      String              @db.VarChar
+  address   String              @db.VarChar
+  latitude  Decimal             @db.Decimal(10, 7)
+  longitude Decimal             @db.Decimal(10, 7)
+  type      locations_type_enum @default(favorite)
+  isActive  Boolean             @default(true)
+  createdAt DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt DateTime            @default(now()) @updatedAt @db.Timestamp(6)
+  user      User                @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_78eda52dc27b7ad20350c4a752d")
+
+  @@map("locations")
+}
+
+model Rating {
+  id        String   @id(map: "PK_rating_id") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  rating    Int      @db.SmallInt
+  comment   String?  @db.Text
+  userId    String   @db.Uuid
+  driverId  String   @db.Uuid
+  rideId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  user      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_rating_user")
+  driver    Driver   @relation(fields: [driverId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_rating_driver")
+  ride      Ride     @relation(fields: [rideId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_rating_ride")
+
+  @@map("ratings")
+}
+
+model SplitFarePayment {
+  id                String                    @id(map: "PK_split_fare_payment") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  rideId            String                    @db.Uuid
+  riderId           String                    @db.Uuid
+  amount            Decimal                   @db.Decimal(10, 2)
+  paymentMethod     split_payment_method_enum
+  paymentStatus     split_payment_status_enum @default(pending)
+  mpesaRequestId    String?                   @db.VarChar
+  mpesaReceiptNumber String?                  @db.VarChar
+  cashConfirmed     Boolean?                  @default(false)
+  confirmedAt       DateTime?                 @db.Timestamp(6)
+  createdAt         DateTime                  @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime                  @default(now()) @updatedAt @db.Timestamp(6)
+  ride              Ride                      @relation(fields: [rideId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_split_fare_ride")
+  rider             User                      @relation(fields: [riderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_split_fare_rider")
+
+  @@map("split_fare_payments")
+}
+
+model GpsTrack {
+  id        String   @id(map: "PK_gps_track") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  rideId    String   @db.Uuid
+  latitude  Decimal  @db.Decimal(10, 8)
+  longitude Decimal  @db.Decimal(11, 8)
+  timestamp DateTime @db.Timestamp(6)
+  accuracy  Decimal? @db.Decimal(8, 2)
+  speed     Decimal? @db.Decimal(8, 2)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+
+  @@map("gps_tracks")
+}
+
+enum UserRole {
+  rider
+  driver
+}
+
+enum DriverVerificationStatus {
+  pending
+  under_review
+  approved
+  rejected
+  requires_resubmission
+}
+
+enum drivers_status_enum {
+  offline
+  online
+  busy
+  available
+}
+
+enum locations_type_enum {
+  home
+  work
+  favorite
+  recent
+}
+
+enum notifications_type_enum {
+  ride
+  payment
+  promotion
+  system
+  emergency
+}
+
+enum payments_method_enum {
+  mpesa
+  stripe
+  wallet
+  cash
+}
+
+enum payments_status_enum {
+  pending
+  completed
+  failed
+  refunded
+}
+
+enum payments_type_enum {
+  ride_payment
+  wallet_topup
+  wallet_withdrawal
+  refund
+}
+
+enum rides_paymentmethod_enum {
+  mpesa
+  stripe
+  wallet
+  cash
+}
+
+enum rides_status_enum {
+  pending
+  accepted
+  arrived
+  started
+  completed
+  cancelled
+  payment_failed
+  no_show
+  no_drivers
+  cancelled_by_passenger
+  cancelled_by_driver
+  declined
+}
+
+enum users_role_enum {
+  Rider
+  Driver
+  Admin
+}
+
+enum users_usertype_enum {
+  student
+  staff
+  resident
+}
+
+enum vehicles_type_enum {
+  motorcycle
+  car
+  lorry
+}
+
+enum split_payment_method_enum {
+  mpesa
+  cash
+}
+
+enum split_payment_status_enum {
+  pending
+  processing
+  completed
+  failed
+  cancelled
+}
