@@ -32,7 +32,8 @@ export interface RegisterRequest {
   email: string;
   password: string;
   phone: string;
-  role: 'Rider' | 'Driver';
+  role?: 'Rider' | 'Driver';
+  registrationType?: 'rider' | 'driver' | 'both';
 }
 
 export interface LoginResponse {
@@ -42,7 +43,16 @@ export interface LoginResponse {
     name: string;
     email: string;
     phone: string;
-    role: string;
+    roles: ('rider' | 'driver')[];
+    activeRole: 'rider' | 'driver';
+    driverId?: string;
+    driver?: {
+      id: string;
+      licenseNumber: string;
+      vehicleInfo: string;
+      rating: number;
+      isOnline: boolean;
+    };
   };
 }
 
@@ -173,6 +183,36 @@ class ApiService {
     return response.data;
   }
 
+  async cancelRide(rideId: string, reason?: string): Promise<any> {
+    const response = await this.api.post(`/rides/${rideId}/cancel`, { reason });
+    return response.data;
+  }
+
+  async getNearbyDrivers(lat: number, lng: number, radius?: number): Promise<any[]> {
+    const response = await this.api.post('/realtime/drivers/nearby', { lat, lng, radius });
+    return response.data.drivers;
+  }
+
+  async updateDriverLocation(location: {
+    latitude: number;
+    longitude: number;
+    heading?: number;
+    speed?: number;
+  }): Promise<any> {
+    const response = await this.api.post('/drivers/update-location', location);
+    return response.data;
+  }
+
+  async getDriverProfile(): Promise<any> {
+    const response = await this.api.get('/drivers/profile');
+    return response.data;
+  }
+
+  async updateDriverProfile(profileData: any): Promise<any> {
+    const response = await this.api.patch('/drivers/profile', profileData);
+    return response.data;
+  }
+
   async getRides(): Promise<any[]> {
     const response = await this.api.get('/rides');
     return response.data;
@@ -188,10 +228,6 @@ class ApiService {
     return response.data;
   }
 
-  async cancelRide(rideId: string): Promise<any> {
-    const response = await this.api.post(`/rides/${rideId}/cancel`);
-    return response.data;
-  }
 
   // Payments
   async createPayment(paymentData: PaymentRequest): Promise<any> {
@@ -258,10 +294,6 @@ class ApiService {
     return response.data;
   }
 
-  async getNearbyDrivers(lat: number, lng: number, radius?: number): Promise<any[]> {
-    const response = await this.api.post('/realtime/drivers/nearby', { lat, lng, radius });
-    return response.data.drivers;
-  }
 
   async startRideTracking(rideId: string): Promise<any> {
     const response = await this.api.post(`/realtime/ride/${rideId}/track`);
@@ -273,10 +305,6 @@ class ApiService {
     return response.data;
   }
 
-  async updateDriverLocation(lat: number, lng: number, heading?: number, speed?: number): Promise<any> {
-    const response = await this.api.post('/realtime/driver/location', { lat, lng, heading, speed });
-    return response.data;
-  }
 
   // Notifications
   async getNotifications(): Promise<any[]> {
@@ -295,15 +323,6 @@ class ApiService {
   }
 
   // Drivers
-  async getDriverProfile(): Promise<any> {
-    const response = await this.api.get('/drivers/profile');
-    return response.data;
-  }
-
-  async updateDriverProfile(profileData: any): Promise<any> {
-    const response = await this.api.patch('/drivers/profile', profileData);
-    return response.data;
-  }
 
   async getDriverRides(): Promise<any[]> {
     const response = await this.api.get('/drivers/rides');
@@ -337,10 +356,6 @@ class ApiService {
     return response.data;
   }
 
-  async requestRide(rideData: RideRequest): Promise<any> {
-    const response = await this.api.post('/rides', rideData);
-    return response.data;
-  }
 
   async rateRide(ratingData: RatingRequest): Promise<any> {
     const response = await this.api.post('/rides/rate', ratingData);
@@ -369,10 +384,6 @@ class ApiService {
   }
 
   // Edge case handling methods
-  async cancelRide(rideId: string, reason?: string): Promise<any> {
-    const response = await this.api.post(`/rides/${rideId}/cancel`, { reason });
-    return response.data;
-  }
 
   async driverCancelRide(rideId: string, reason?: string): Promise<any> {
     const response = await this.api.post(`/rides/${rideId}/driver-cancel`, { reason });
@@ -464,15 +475,6 @@ class ApiService {
     return response.data;
   }
 
-  async updateDriverLocation(location: {
-    latitude: number;
-    longitude: number;
-    heading?: number;
-    speed?: number;
-  }): Promise<any> {
-    const response = await this.api.post('/drivers/update-location', location);
-    return response.data;
-  }
 
   async setDriverAvailability(isAvailable: boolean, reason?: string): Promise<any> {
     const response = await this.api.post('/drivers/set-availability', {
@@ -488,15 +490,6 @@ class ApiService {
   }
 
   // Rider-specific methods
-  async requestRide(rideData: any): Promise<any> {
-    const response = await this.api.post('/riders/request-ride', rideData);
-    return response.data;
-  }
-
-  async getNearbyDrivers(): Promise<any> {
-    const response = await this.api.get('/riders/nearby-drivers');
-    return response.data;
-  }
 
   async getFareEstimate(pickup: any, destination: any, rideType?: string): Promise<any> {
     const response = await this.api.post('/riders/fare-estimate', {
@@ -522,10 +515,6 @@ class ApiService {
     return response.data;
   }
 
-  async cancelRide(rideId: string, reason?: string): Promise<any> {
-    const response = await this.api.post(`/riders/cancel-ride/${rideId}`, { reason });
-    return response.data;
-  }
 
   async getPaymentMethods(): Promise<any> {
     const response = await this.api.get('/riders/payment-methods');
@@ -604,15 +593,6 @@ class ApiService {
     return response.data;
   }
 
-  async getDriverProfile(): Promise<any> {
-    const response = await this.api.get('/driver-registration/profile');
-    return response.data;
-  }
-
-  async updateDriverProfile(profileData: any): Promise<any> {
-    const response = await this.api.put('/driver-registration/profile', profileData);
-    return response.data;
-  }
 
   async getDriverVehicles(): Promise<any> {
     const response = await this.api.get('/driver-registration/vehicles');

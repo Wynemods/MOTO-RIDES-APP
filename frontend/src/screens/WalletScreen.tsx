@@ -154,7 +154,7 @@ export default function WalletScreen() {
         <Card style={styles.downloadCard}>
           <Card.Content style={styles.downloadContent}>
             <Text style={styles.downloadText}>Weekly Summary</Text>
-            <MaterialIcons name="download" size={20} color="#666" />
+            <MaterialIcons name="file-download" size={20} color="#666" />
           </Card.Content>
         </Card>
       </View>

@@ -231,7 +231,7 @@ export default function RidesScreen() {
           rideId={selectedRide.id}
           fare={parseFloat(selectedRide.cost.replace(' KSH', ''))}
           currency="KSH"
-          userType={user?.role === 'Driver' ? 'driver' : 'rider'}
+          userType={user?.activeRole === 'driver' ? 'driver' : 'rider'}
           onClose={() => {
             setShowCashConfirmation(false);
             setSelectedRide(null);

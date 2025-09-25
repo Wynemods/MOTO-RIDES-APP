@@ -7,10 +7,10 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  Image,
-  Picker
+  Image
 } from 'react-native';
-import { apiService } from '../services/api.service';
+import { Picker } from '@react-native-picker/picker';
+import ApiService from '../services/api.service';
 
 interface VehicleDetails {
   type: 'motorcycle' | 'car' | 'lorry';
@@ -90,7 +90,7 @@ export const DriverRegistrationForm: React.FC<DriverRegistrationFormProps> = ({
       }
 
       // Submit registration
-      const response = await apiService.registerDriver(formData);
+      const response = await ApiService.registerDriver(formData);
       
       Alert.alert(
         'Registration Successful',

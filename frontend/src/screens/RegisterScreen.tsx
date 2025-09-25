@@ -104,7 +104,7 @@ export default function RegisterScreen() {
     });
 
     if (success) {
-      navigation.navigate('MainTabs');
+      (navigation as any).navigate('MainTabs');
     }
   };
 
@@ -365,7 +365,7 @@ export default function RegisterScreen() {
               {/* Login Link */}
               <View style={styles.loginContainer}>
                 <Text style={styles.loginText}>Already have an account? </Text>
-                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <TouchableOpacity onPress={() => (navigation as any).navigate('Login')}>
                   <Text style={styles.loginLink}>Sign In</Text>
                 </TouchableOpacity>
               </View>

@@ -1,5 +1,16 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Notification, NotificationType } from '../components/NotificationSystem';
+import { NotificationType } from '../components/NotificationSystem';
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  timestamp: Date;
+  read?: boolean;
+  data?: any;
+  duration?: number;
+}
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -35,6 +46,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       title,
       message,
       duration,
+      timestamp: new Date(),
     };
 
     setNotifications(prev => [...prev, notification]);

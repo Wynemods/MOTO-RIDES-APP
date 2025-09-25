@@ -45,7 +45,8 @@ interface RidesContextType {
     pickup: { lat: number; lng: number; address: string };
     destination: { lat: number; lng: number; address: string };
     fare: number;
-    paymentMethod: 'mpesa' | 'stripe' | 'wallet';
+    paymentMethod: 'cash' | 'wallet' | 'mpesa' | 'card';
+    rideType?: 'bike' | 'car' | 'premium';
   }) => Promise<boolean>;
   cancelRide: (rideId: string) => Promise<boolean>;
   updateRideStatus: (rideId: string, status: string) => Promise<boolean>;
@@ -137,11 +138,15 @@ export const RidesProvider: React.FC<RidesProviderProps> = ({ children }) => {
     pickup: { lat: number; lng: number; address: string };
     destination: { lat: number; lng: number; address: string };
     fare: number;
-    paymentMethod: 'mpesa' | 'stripe' | 'wallet';
+    paymentMethod: 'cash' | 'wallet' | 'mpesa' | 'card';
+    rideType?: 'bike' | 'car' | 'premium';
   }): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const ride = await ApiService.requestRide(rideData);
+      const ride = await ApiService.requestRide({
+        ...rideData,
+        rideType: rideData.rideType || 'bike'
+      });
       setCurrentRide(ride);
       
       // Send ride request via WebSocket
@@ -250,7 +255,7 @@ export const RidesProvider: React.FC<RidesProviderProps> = ({ children }) => {
     if (!currentRide) return;
     
     try {
-      const recipientId = user?.role === 'Driver' ? currentRide.riderId : currentRide.driverId;
+      const recipientId = user?.activeRole === 'driver' ? currentRide.riderId : currentRide.driverId;
       if (recipientId) {
         WebSocketService.sendMessage(currentRide.id, message, recipientId);
       }

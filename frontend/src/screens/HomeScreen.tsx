@@ -144,7 +144,7 @@ export default function HomeScreen() {
           address: selectedToLocation.address,
         },
         fare: fareEstimate?.finalFare || 0,
-        paymentMethod: selectedPaymentMethod === 'card' ? 'stripe' : selectedPaymentMethod as 'wallet' | 'mpesa' | 'stripe',
+        paymentMethod: selectedPaymentMethod as 'cash' | 'wallet' | 'mpesa' | 'card',
       };
 
       const success = await requestRide(rideData);

@@ -194,7 +194,7 @@ export default function WelcomeScreen() {
           <View style={styles.buttonSection}>
             <Button
               mode="contained"
-              onPress={() => navigation.navigate('Login')}
+              onPress={() => (navigation as any).navigate('Login')}
               style={styles.primaryButton}
               labelStyle={styles.primaryButtonText}
               contentStyle={styles.buttonContent}
@@ -204,7 +204,7 @@ export default function WelcomeScreen() {
             
             <Button
               mode="outlined"
-              onPress={() => navigation.navigate('Register')}
+              onPress={() => (navigation as any).navigate('Register')}
               style={styles.secondaryButton}
               labelStyle={styles.secondaryButtonText}
               contentStyle={styles.buttonContent}

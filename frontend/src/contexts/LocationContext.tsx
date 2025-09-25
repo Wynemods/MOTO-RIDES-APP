@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import * as Location from 'expo-location';
-import OpenStreetMapService, { Location as LocationType } from '../services/openstreetmap.service';
+import OpenStreetMapService from '../services/openstreetmap.service';
+
+interface LocationType {
+  latitude: number;
+  longitude: number;
+  address?: string;
+}
 
 interface LocationContextType {
   currentLocation: LocationType | null;
@@ -67,10 +73,7 @@ export const LocationProvider: React.FC<LocationProviderProps> = ({ children }) 
         throw new Error('Current location not available');
       }
 
-      return await OpenStreetMapService.searchPlaces(query, {
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude,
-      });
+      return await OpenStreetMapService.searchPlaces(query, currentLocation.latitude, currentLocation.longitude);
     } catch (err) {
       console.error('Error searching places:', err);
       setError(err instanceof Error ? err.message : 'Failed to search places');
