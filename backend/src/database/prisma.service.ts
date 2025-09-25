@@ -14,7 +14,16 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   async onModuleInit() {
-    await this.$connect();
+    try {
+      await this.$connect();
+    } catch (error) {
+      if (process.env.ALLOW_DB_MISSING === 'true') {
+        // eslint-disable-next-line no-console
+        console.warn('[Prisma] Database connection failed, continuing because ALLOW_DB_MISSING=true. Error:', (error as Error).message);
+      } else {
+        throw error;
+      }
+    }
   }
 
   async onModuleDestroy() {
