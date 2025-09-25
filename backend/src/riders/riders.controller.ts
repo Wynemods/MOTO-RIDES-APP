@@ -37,7 +37,7 @@ export class RidersController {
     return { message: 'Nearby drivers feature - requires location data' };
   }
 
-  @Get('fare-estimate')
+  @Post('fare-estimate')
   @ApiOperation({ summary: 'Get fare estimate (Rider only)' })
   @ApiResponse({ status: 200, description: 'Fare estimate calculated successfully' })
   async getFareEstimate(@CurrentUser() user: any, @Body() body: { 
@@ -78,9 +78,8 @@ export class RidersController {
   @ApiOperation({ summary: 'Cancel a ride (Rider only)' })
   @ApiResponse({ status: 200, description: 'Ride cancelled successfully' })
   @ApiResponse({ status: 400, description: 'Invalid cancellation request' })
-  async cancelRide(@CurrentUser() user: any, @Body() body: { reason?: string }) {
-    // This would need the rideId from the route parameter
-    return { message: 'Cancel ride feature - requires rideId parameter' };
+  async cancelRide(@CurrentUser() user: any, @Param('rideId') rideId: string, @Body() body: { reason?: string }) {
+    return this.ridesService.cancelRide(rideId, user.id, body.reason);
   }
 
   @Get('payment-methods')
