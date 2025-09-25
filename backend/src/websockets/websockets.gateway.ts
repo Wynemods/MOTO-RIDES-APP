@@ -70,9 +70,10 @@ export class WebsocketsGateway
 
         // Set user data on socket
         client.userId = user.id;
-        client.userType = user.role === 'Driver' ? 'driver' : 'rider';
-        if (user.role === 'Driver') {
-          client.driverId = user.driver?.id;
+        const activeRole = (user as any).activeRole || (Array.isArray((user as any).roles) && (user as any).roles.includes('driver') ? 'driver' : 'rider');
+        client.userType = activeRole === 'driver' ? 'driver' : 'rider';
+        if ((user as any).driver?.id) {
+          client.driverId = (user as any).driver.id;
         }
 
         // Store connected user
@@ -93,6 +94,7 @@ export class WebsocketsGateway
         client.join('drivers');
         this.logger.log(`Driver ${client.userId} connected`);
       } else {
+        client.join('riders');
         this.logger.log(`Rider ${client.userId} connected`);
       }
 

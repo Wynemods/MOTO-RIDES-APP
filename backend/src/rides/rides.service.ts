@@ -1133,7 +1133,7 @@ export class RidesService {
       throw new NotFoundException('Ride not found');
     }
 
-    if (!['started', 'in_progress'].includes(ride.status)) {
+    if (!['started', 'accepted'].includes(ride.status)) {
       throw new BadRequestException('GPS tracking can only be updated for active rides');
     }
 

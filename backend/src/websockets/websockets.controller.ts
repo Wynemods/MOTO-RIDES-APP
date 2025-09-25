@@ -36,7 +36,7 @@ export class WebsocketsController {
     };
   }
 
-  @Get('drivers/nearby')
+  @Post('drivers/nearby')
   @ApiOperation({ summary: 'Get nearby drivers' })
   @ApiResponse({ status: 200, description: 'Nearby drivers retrieved successfully' })
   async getNearbyDrivers(
